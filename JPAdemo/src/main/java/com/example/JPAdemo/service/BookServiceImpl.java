@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.JPAdemo.domain.Book;
+import com.example.JPAdemo.dto.BookDto;
 import com.example.JPAdemo.repository.BookRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Book registBook(String title) throws Exception {
-		Book book = Book.builder()
-				.title(title)
-				.build();
-		return bookRepository.save(book);
+	public Book registBook(BookDto dto) throws Exception {
+		return bookRepository.save(dto.toEntity());
 	}
 
 	@Override
@@ -39,9 +37,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Book republishBook(long id, String title) throws Exception {
-		Book book = Book.builder().id(id).title(title).build();
-		return bookRepository.save(book);
+	public Book republishBook(BookDto dto) throws Exception {
+		return bookRepository.save(dto.toEntity());
 	}
 
 	@Override

@@ -21,7 +21,7 @@ import lombok.ToString;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Builder
 @ToString
 @EqualsAndHashCode
@@ -39,6 +39,7 @@ public class Book {
 	
 	@Column(nullable = false)
 	private String title;
+	
 	
 	@OneToMany(mappedBy = "book")
 	private List<BookContract> bookContracts;

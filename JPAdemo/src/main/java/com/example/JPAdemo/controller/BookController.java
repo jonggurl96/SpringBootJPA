@@ -1,7 +1,6 @@
 package com.example.JPAdemo.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.JPAdemo.domain.Book;
+import com.example.JPAdemo.dto.BookDto;
 import com.example.JPAdemo.service.BookService;
 
 import lombok.RequiredArgsConstructor;
@@ -47,10 +47,10 @@ public class BookController {
 	}
 	
 	@PostMapping("/regist")
-	public ResponseEntity<Book> registBook(@RequestBody String title) {
+	public ResponseEntity<Book> registBook(@RequestBody BookDto dto) {
 		ResponseEntity<Book> entity = null;
 		try {
-			entity = new ResponseEntity<>(service.registBook(title), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.registBook(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -59,13 +59,11 @@ public class BookController {
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<Book> republishBook(@RequestBody Map<String, String> map) {
+	public ResponseEntity<Book> republishBook(@RequestBody BookDto dto) {
 		ResponseEntity<Book> entity = null;
-		long id = Long.parseLong(map.get("id"));
-		String title = map.get("title");
-		logger.info("update: " + id + ", " + title);
+		logger.info("update: " + dto);
 		try {
-			entity = new ResponseEntity<>(service.republishBook(id, title), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.republishBook(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);

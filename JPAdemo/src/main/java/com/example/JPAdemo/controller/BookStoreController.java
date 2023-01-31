@@ -1,7 +1,6 @@
 package com.example.JPAdemo.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.JPAdemo.domain.BookStore;
+import com.example.JPAdemo.dto.BookStoreDto;
 import com.example.JPAdemo.service.BookStoreService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,11 +31,11 @@ public class BookStoreController {
 	private static final Logger logger = LoggerFactory.getLogger(BookStoreController.class);
 	
 	@PostMapping("/build")
-	public ResponseEntity<BookStore> newStore(@RequestBody String name) {
+	public ResponseEntity<BookStore> newStore(@RequestBody BookStoreDto dto) {
 		ResponseEntity<BookStore> entity = null;
-		logger.info("new store: " + name);
+		logger.info("new store name: " + dto.getName());
 		try {
-			entity = new ResponseEntity<>(service.buildBookStore(name), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.buildBookStore(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -70,13 +70,11 @@ public class BookStoreController {
 	}
 	
 	@PutMapping("/remodel")
-	public ResponseEntity<BookStore> getOneStore(@RequestBody Map<String, String> map) {
+	public ResponseEntity<BookStore> getOneStore(@RequestBody BookStoreDto dto) {
 		ResponseEntity<BookStore> entity = null;
-		long id = Long.parseLong(map.get("id"));
-		String name = map.get("name");
-		logger.info("store remodeling: " + id + ", " + name);
+		logger.info("store remodeling dto id: " + dto.getId() + ", name: " + dto.getName());
 		try {
-			entity = new ResponseEntity<>(service.remodeling(id, name), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.remodeling(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -85,12 +83,11 @@ public class BookStoreController {
 	}
 	
 	@DeleteMapping("/burn")
-	public ResponseEntity<String> burnStore(@RequestBody String sid) {
+	public ResponseEntity<String> burnStore(@RequestBody BookStoreDto dto) {
 		ResponseEntity<String> entity = null;
-		long id = Long.parseLong(sid);
-		logger.info("burning store id: " + id);
+		logger.info("burning store id: " + dto.getId());
 		try {
-			service.closeBookStore(id);
+			service.closeBookStore(dto);
 			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);
 		} catch(Exception e) {
 			logger.error(e.getMessage());

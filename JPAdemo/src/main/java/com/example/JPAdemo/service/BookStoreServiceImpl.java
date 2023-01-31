@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.JPAdemo.domain.BookStore;
+import com.example.JPAdemo.dto.BookStoreDto;
 import com.example.JPAdemo.repository.BookStoreRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -16,10 +17,8 @@ public class BookStoreServiceImpl implements BookStoreService {
 	private final BookStoreRepository repository;
 
 	@Override
-	public BookStore buildBookStore(String name) throws Exception {
-		BookStore bs = BookStore.builder()
-				.name(name).build();
-		return repository.save(bs);
+	public BookStore buildBookStore(BookStoreDto dto) throws Exception {
+		return repository.save(dto.toEntity());
 	}
 
 	@Override
@@ -33,15 +32,13 @@ public class BookStoreServiceImpl implements BookStoreService {
 	}
 
 	@Override
-	public BookStore remodeling(long id, String name) throws Exception {
-		BookStore bs = BookStore.builder()
-				.id(id).name(name).build();
-		return repository.save(bs);
+	public BookStore remodeling(BookStoreDto dto) throws Exception {
+		return repository.save(dto.toEntity());
 	}
 
 	@Override
-	public void closeBookStore(long id) throws Exception {
-		repository.deleteById(id);
+	public void closeBookStore(BookStoreDto dto) throws Exception {
+		repository.deleteById(dto.getId());
 	}
 
 }
