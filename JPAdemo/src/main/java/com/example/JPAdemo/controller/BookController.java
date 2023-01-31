@@ -1,6 +1,7 @@
 package com.example.JPAdemo.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,11 +59,13 @@ public class BookController {
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<Book> republishBook(@RequestBody Book book) {
+	public ResponseEntity<Book> republishBook(@RequestBody Map<String, String> map) {
 		ResponseEntity<Book> entity = null;
-		logger.info("update: " + book);
+		long id = Long.parseLong(map.get("id"));
+		String title = map.get("title");
+		logger.info("update: " + id + ", " + title);
 		try {
-			entity = new ResponseEntity<>(service.republishBook(book), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.republishBook(id, title), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -88,7 +91,7 @@ public class BookController {
 		ResponseEntity<Book> entity = null;
 		logger.info("select: " + id);
 		try {
-			entity = new ResponseEntity<>(service.chooseBook(id).get(), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.chooseBook(id), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}

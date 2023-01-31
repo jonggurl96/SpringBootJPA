@@ -1,7 +1,6 @@
 package com.example.JPAdemo.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -30,8 +29,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Optional<Book> chooseBook(long id) throws Exception {
-		return bookRepository.findById(id);
+	public Book chooseBook(long id) throws Exception {
+		return bookRepository.findById(id).get();
 	}
 
 	@Override
@@ -40,7 +39,8 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public Book republishBook(Book book) throws Exception {
+	public Book republishBook(long id, String title) throws Exception {
+		Book book = Book.builder().id(id).title(title).build();
 		return bookRepository.save(book);
 	}
 
