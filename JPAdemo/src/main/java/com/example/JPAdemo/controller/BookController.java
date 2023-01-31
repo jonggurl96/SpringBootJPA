@@ -4,8 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,6 +51,44 @@ public class BookController {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@PutMapping("/update")
+	public ResponseEntity<Book> republishBook(@RequestBody Book book) {
+		ResponseEntity<Book> entity = null;
+		logger.info("update: " + book);
+		try {
+			entity = new ResponseEntity<>(service.republishBook(book), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@DeleteMapping("/delete")
+	public ResponseEntity<String> burnBook(@RequestBody String id) {
+		ResponseEntity<String> entity = null;
+		logger.info("delete: " + id);
+		try {
+			service.burnBook(Long.parseLong(id));
+			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+		} catch (Exception e) {
+			entity = new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@GetMapping("/{bookId}")
+	public ResponseEntity<Book> chooseBook(@PathVariable("bookId") long id) {
+		ResponseEntity<Book> entity = null;
+		logger.info("select: " + id);
+		try {
+			entity = new ResponseEntity<>(service.chooseBook(id).get(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
 		}
 		return entity;
 	}

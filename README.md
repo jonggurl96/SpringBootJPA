@@ -33,10 +33,21 @@ spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.H2Dialect
 
 ## Hibernate가 실행하는 모든 query를 콘솔로 출력
 spring.jpa.properties.hibernate.show_sql = true
+## 좀 더 예쁘게 출력
+spring.jpa.properties.hibernate.format_sql = true
 
 ## 디버깅용 sql문 이외에 추가적인 정보를 출력
 spring.jpa.properties.hibernate.use_sql_comments = true
 
+spring.sql.init.mode = always
+spring.sql.init.platform = h2
+spring.jpa.defer-datasource-initialization = true // 테이블 실행 전 데이터 추가 방지
+
+## src/main/resources/*.sql - 테이블과 시퀀스 생성 쿼리 서버 실행 시 자동 실행, 함께 사용하는 것 권장X
+# 사용한다면 테스트 용 데이터 추가 쿼리만 사용할 것
+# 문자열은 반드시 홑따옴표 사용!!!! 쌍따옴표 에러!!!!
+spring.sql.init.data-locations = classpath:data.sql // 데이터 추가 쿼리
+spring.sql.init.schema-locations = classpath:schema.sql // 테이블 생성 쿼리 @Entity와 함께 사용 시 에러
 
 # H2DB JDBC 연결 - h2w 실행하여 복붙 가능
 spring.datasource.url = jdbc:h2:tcp://localhost/~/test
@@ -44,8 +55,12 @@ spring.datasource.driver-class-name = org.h2.Driver
 spring.datasource.username = test
 spring.datasource.password = test
 
-# 테이블이 존재하지 않는다면 자동 생성
-spring.jpa.hibernate.ddl-auto=create
+# 서버 시작 시 기존 테이블 drop 후 테이블 create, 개발 초기 단계
+spring.jpa.hibernate.ddl-auto = create
+# create-drop: 서버 시작 시 기존 테이블 drop 후 테이블 create, 종료 시 drop
+# update: 변경분만 반영, 개발 초기 단계, 테스트 서버
+# validate: entity와 table이 제대로 매핑되었는지 확인, 테스트 서버, 스테이징과 운영 서버
+# none: 사용하지 않음, 스테이징과 운영 서버
 
 # server port
 server.port=8081
@@ -57,20 +72,21 @@ server.port=8081
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder // @NoArgsConstructor와 함께 사용하는 경우 @AllArgsConstructor 반드시 사용
+@Builder // @NoArgsConstructor와 @AllArgsConstructor 반드시 사용
 @Table(name = "tbl_book") // DB 테이블과 이름이 다를 때 사용, 생략 가능
 @SequenceGenerator( // id seq 정의
     name = "BOOKSEQ", // Java에서 사용할 이름
     sequenceName = "BOOK_SEQ", // DB 상에 정의된 Sequence 이름
     initialValue = 1, // 초기값
     allocationSize = 1 // 1개씩 DB에서 읽어와 적용
-)
+) // @Entity로 DDL 사용 시 함께 자동으로 생성
 public class Book {
     @Id // PK 명시
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BOOKSEQ")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "BOOKSEQ") // jpa가 자동으로 GenerationType.SEQUENCE 적용
     private long id;
 
     @Column(name = "title", nullable = false, columnDefinition = "varchar(255) default 'EMPTY'") // 속성 생략 가능
+    //속성 미 지정 시 String 값은 varchar(255)로 생성됨
     private String title;
 }
 ```
@@ -83,14 +99,13 @@ Book book = Book.builder().title("title").build();
 ### GenerationType
 - @GeneratedValue(strategy = GenerationType.AUTO): default(JPA 구현체가 생성 방식을 결정)
 - @GeneratedValue(strategy = GenerationType.IDENTITY): auto_increment를 지원하는 MySql 등에서 사용
-- @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLEGENERATOR)
 - @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCEGENERATOR): auto_increment를 지원하지 않는 Oracle 등에서 사용
-    - DB에 sequence가 생성된 상태여야 사용 가능
+- @GeneratedValue(strategy = GenerationType.TABLE, generator = TABLEGENERATOR)
 
 ### 컬럼명 camelCase로 바꾸기
 ```
 application.properties
-jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+> jpa.hibernate.naming.physical-strategy = org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 ```
 
 # Repository<T, ID>
@@ -111,7 +126,7 @@ public interface **Repository extends Repository<T, ID> {
 <S extends T> Iterable<S> saveAll(Iterable<S> entity);
 
 /** select(R) */
-Optional<T> findById(ID id);
+Optional<T> findById(ID id); // java.util.Optional<T> 객체.get() 메소드로 T 반환 가능
 Iterable<T> findAll();
 Iterable<T> findAllById(Iterable<ID> ids);
 long count();

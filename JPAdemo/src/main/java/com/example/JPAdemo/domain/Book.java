@@ -24,14 +24,14 @@ import lombok.ToString;
 @EqualsAndHashCode
 @Table(name="book")
 @SequenceGenerator(
-		name = "BOOKSEQ",
-		sequenceName = "book_seq",
+		name = "BOOK_SEQ_GENERATOR",
+		sequenceName = "BOOK_SEQ",
 		initialValue = 1,
 		allocationSize = 1)
 public class Book {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BOOKSEQ")
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "BOOK_SEQ_GENERATOR")
 	private long id;
 	
 	@Column(nullable = false)
