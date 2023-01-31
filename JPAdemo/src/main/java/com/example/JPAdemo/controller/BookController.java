@@ -1,5 +1,7 @@
 package com.example.JPAdemo.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -89,6 +91,19 @@ public class BookController {
 			entity = new ResponseEntity<>(service.chooseBook(id).get(), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+		}
+		return entity;
+	}
+	
+	@GetMapping("/all")
+	public ResponseEntity<List<Book>> allBooks() {
+		ResponseEntity<List<Book>> entity = null;
+		logger.info("search every book");
+		try {
+			entity = new ResponseEntity<>(service.bookList(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		return entity;
 	}

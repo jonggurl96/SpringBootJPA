@@ -1,5 +1,6 @@
 package com.example.JPAdemo.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -42,7 +43,10 @@ public class BookServiceImpl implements BookService {
 	public Book republishBook(Book book) throws Exception {
 		return bookRepository.save(book);
 	}
-	
-	
 
+	@Override
+	public List<Book> bookList() throws Exception {
+		return bookRepository.findAll();
+	}
+	
 }
