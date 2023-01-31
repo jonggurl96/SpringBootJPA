@@ -1,6 +1,9 @@
 package com.example.JPAdemo.dto;
 
+import com.example.JPAdemo.domain.Book;
 import com.example.JPAdemo.domain.BookContract;
+import com.example.JPAdemo.domain.BookContractId;
+import com.example.JPAdemo.domain.BookStore;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,23 +15,32 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookContractDto {
 
-	private BookDto book;
-	private BookStoreDto bookStore;
+	private long bookId;
+	private String title;
+	private long bookStoreId;
+	private String name;
 	private int price;
 	
-	// @Entity -> to Dto
+	// @Entity -> Dto
 	public BookContractDto(BookContract bc) {
-		this.book = new BookDto(bc.getBook());
-		this.bookStore = new BookStoreDto(bc.getBookStore());
+		this.bookId = bc.getBook().getId();
+		this.title = bc.getBook().getTitle();
+		this.bookStoreId = bc.getBookStore().getId();
+		this.name = bc.getBookStore().getName();
 		this.price = bc.getPrice();
 	}
 	
 	// Dto -> @Entity
 	public BookContract toEntity() {
 		return BookContract.builder()
-				.book(book.toEntity())
-				.bookStore(bookStore.toEntity())
+				.book(Book.builder().id(bookId).title(title).build())
+				.bookStore(BookStore.builder().id(bookStoreId).name(name).build())
 				.price(price)
 				.build();
+	}
+	
+	// Dto -> @Entity Key
+	public BookContractId toEntryKey() {
+		return new BookContractId(bookId, bookStoreId);
 	}
 }

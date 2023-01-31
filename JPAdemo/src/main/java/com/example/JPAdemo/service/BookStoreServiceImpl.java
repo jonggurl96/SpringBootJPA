@@ -1,5 +1,6 @@
 package com.example.JPAdemo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -27,8 +28,12 @@ public class BookStoreServiceImpl implements BookStoreService {
 	}
 
 	@Override
-	public List<BookStore> getBookStores() throws Exception {
-		return repository.findAll();
+	public List<BookStoreDto> getBookStores() throws Exception {
+		List<BookStoreDto> dtos = new ArrayList<BookStoreDto>();
+		for(BookStore bs : repository.findAll()) {
+			dtos.add(new BookStoreDto(bs));
+		}
+		return dtos;
 	}
 
 	@Override

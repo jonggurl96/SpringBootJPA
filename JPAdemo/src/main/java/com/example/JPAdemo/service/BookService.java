@@ -17,5 +17,5 @@ public interface BookService {
 	
 	public Book republishBook(BookDto dto) throws Exception;
 	
-	public List<Book> bookList() throws Exception;
+	public List<BookDto> bookList() throws Exception;
 }

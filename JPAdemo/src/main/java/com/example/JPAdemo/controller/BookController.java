@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.JPAdemo.domain.Book;
 import com.example.JPAdemo.dto.BookDto;
 import com.example.JPAdemo.service.BookService;
 
@@ -47,10 +46,11 @@ public class BookController {
 	}
 	
 	@PostMapping("/regist")
-	public ResponseEntity<Book> registBook(@RequestBody BookDto dto) {
-		ResponseEntity<Book> entity = null;
+	public ResponseEntity<BookDto> registBook(@RequestBody BookDto dto) {
+		ResponseEntity<BookDto> entity = null;
 		try {
-			entity = new ResponseEntity<>(service.registBook(dto), HttpStatus.OK);
+			dto = new BookDto(service.registBook(dto));
+			entity = new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -59,11 +59,12 @@ public class BookController {
 	}
 	
 	@PutMapping("/update")
-	public ResponseEntity<Book> republishBook(@RequestBody BookDto dto) {
-		ResponseEntity<Book> entity = null;
+	public ResponseEntity<BookDto> republishBook(@RequestBody BookDto dto) {
+		ResponseEntity<BookDto> entity = null;
 		logger.info("update: " + dto);
 		try {
-			entity = new ResponseEntity<>(service.republishBook(dto), HttpStatus.OK);
+			dto = new BookDto(service.republishBook(dto));
+			entity = new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -85,11 +86,12 @@ public class BookController {
 	}
 	
 	@GetMapping("/{bookId}")
-	public ResponseEntity<Book> chooseBook(@PathVariable("bookId") long id) {
-		ResponseEntity<Book> entity = null;
+	public ResponseEntity<BookDto> chooseBook(@PathVariable("bookId") long id) {
+		ResponseEntity<BookDto> entity = null;
 		logger.info("select: " + id);
 		try {
-			entity = new ResponseEntity<>(service.chooseBook(id), HttpStatus.OK);
+			BookDto dto = new BookDto(service.chooseBook(id));
+			entity = new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
@@ -97,8 +99,8 @@ public class BookController {
 	}
 	
 	@GetMapping("/all")
-	public ResponseEntity<List<Book>> allBooks() {
-		ResponseEntity<List<Book>> entity = null;
+	public ResponseEntity<List<BookDto>> allBooks() {
+		ResponseEntity<List<BookDto>> entity = null;
 		logger.info("search every book");
 		try {
 			entity = new ResponseEntity<>(service.bookList(), HttpStatus.OK);

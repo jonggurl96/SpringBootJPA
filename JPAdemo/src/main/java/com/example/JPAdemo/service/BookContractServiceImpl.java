@@ -1,14 +1,13 @@
 package com.example.JPAdemo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import com.example.JPAdemo.domain.BookContract;
-import com.example.JPAdemo.domain.BookContractId;
+import com.example.JPAdemo.dto.BookContractDto;
 import com.example.JPAdemo.repository.BookContractRepository;
-import com.example.JPAdemo.repository.BookRepository;
-import com.example.JPAdemo.repository.BookStoreRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,38 +16,36 @@ import lombok.RequiredArgsConstructor;
 public class BookContractServiceImpl implements BookContractService {
 	
 	private final BookContractRepository repository;
-	private final BookRepository br;
-	private final BookStoreRepository bsr;
 
 	@Override
-	public BookContract make(long book, long bookstore, int price) throws Exception {
-		BookContract con = BookContract.builder()
-				.book(br.findById(book).get())
-				.bookStore(bsr.findById(bookstore).get())
-				.price(price)
-				.build();
-		return repository.save(con);
+	public BookContractDto make(BookContractDto dto) throws Exception {
+		return new BookContractDto(repository.save(dto.toEntity()));
 	}
 
 	@Override
-	public BookContract getOne(long book, long bookstore) throws Exception {
-		return repository.findById(new BookContractId(book, bookstore)).get();
+	public BookContractDto getOne(BookContractDto dto) throws Exception {
+		return new BookContractDto(
+				repository.findById(dto.toEntryKey()).get());
 	}
 
 	@Override
-	public List<BookContract> getAll() throws Exception {
-		return repository.findAll();
+	public List<BookContractDto> getAll() throws Exception {
+		List<BookContractDto> dtos = new ArrayList<BookContractDto>();
+		for(BookContract bc : repository.findAll()) {
+			dtos.add(new BookContractDto(bc));
+		}
+		return dtos;
 	}
 
 	@Override
-	public void breakIt(long book, long bookstore) throws Exception {
-		repository.deleteById(new BookContractId(book, bookstore));
+	public void breakIt(BookContractDto dto) throws Exception {
+		repository.deleteById(dto.toEntryKey());
 	}
 
 	@Override
-	public BookContract renewal(long book, long bookstore, int price) throws Exception {
+	public BookContractDto renewal(BookContractDto dto) throws Exception {
 		// TODO Auto-generated method stub
-		return null;
+		return new BookContractDto(repository.save(dto.toEntity()));
 	}
 
 }

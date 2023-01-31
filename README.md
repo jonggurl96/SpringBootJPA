@@ -6,6 +6,7 @@
 - H2DB
 - Lombok
 - Maven
+- web은 만들지 않고 Advanced REST Client 사용
 
 # @SpringBootApplication
 - @ComponentScan - 해당 패키지와 하위 패키지의 Bean 등록
@@ -194,3 +195,101 @@ public List<T> method(fromDate, toDate);
 # @RequiredArgsConstructor
 이 annotation이 적용된 클래스의 멤버 변수는 @SpringBootApplication에 포함된 @ComponentScan이 읽어 Bean으로 등록한다.
 따라서 Repository<T, ID>를 구현한 Repository 인터페이스나 Service 등을 구현한 객체는 해당 annotation을 달아줘야 Bean으로 등록된다.
+
+# M:N 관계와 복합키 설정
+@ManyToMany는 사용하지 않고 관계 테이블 생성
+> ex> Book과 BookStore의 M:N 관계를 BookContract라는 객체를 이용해 1:N 관계로 분리
+```
+@Entity public class Book {
+    ...
+    @OneToMany(mappedBy = "book") // 관계 객체에서 사용할 변수 이름
+    private Collection<BookContract> list;
+}
+
+@Entity public class BookStore {
+    ...
+    @OneToMany(mappedBy = "bookStore")
+    private Collection<BookContract> list;
+}
+
+@Entity
+@IdClass(BookContractId.class)
+public class BookContract {
+    @Id
+    @ManyToOne // OneToMany와 대칭
+    @JoinColumn(name = "book_id") // FK 이름
+    private Book book; // mappedBy
+
+    @Id
+    @ManyToOne // OneToMany와 대칭
+    @JoinColumn(name = "book_store_id") // FK 이름
+    private BookStore bookStore; // mappedBy
+}
+
+@Getter @Setter
+@AllArgsConstructor @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode // 필수!!
+public class BookContractId implements Serializable { // Repository<T, Id: Serializable>
+    /** 이 id class를 사용하는 클래스의 @Id Entity들의 @Id 값 */
+    private long bookId;
+    private long bookStoreId;
+}
+```
+> 여기까지 하고 repository를 이용해 entity를 출력하면 Stack Overflow 발생함
+```
+{
+    "book": {
+        "id": 1,
+        "title": "Do it! HTML5 + CSS3 웹 표준의 정석",
+        "bookContracts": [
+            {
+                "book": {
+                    "id": 1,
+                    "title": "Do it! HTML5 + CSS3 웹 표준의 정석",
+                    "bookContracts": [
+                        {
+                            "book": {
+                                "id": 1,
+                                ...
+```
+## DTO 사용하기!!
+repository에서 읽어온 값을 DTO에 필요한 값만 저장하여 위와 같은 문제를 방지
+> dto에서 entity 값이나 해당 entity의 dto 값을 멤버 변수로 삼으면 해결되지 않을 수 있으니 정말 필요한 변수만 되도록 premitive 값으로 받아온다
+```
+public class BookContractDto {
+    /** Book */
+    private long bookId;
+    private String title;
+    /** BookStore */
+    private long bookStoreId;
+    private String name;
+
+    private int price;
+
+    /** 아래는 Dto와 @Entity를 변환해주는 메소드들 중간 계층에 분리시킬 수 있으나 귀찮아서 여기서 함 */
+
+    /** @Entity -> Dto */
+    public BookContractDto(BookContract bc) {
+        this.bookId = bc.getBook().getId();
+        ...
+    }
+
+    /** Dto -> @Entity */
+    public BookContract toEntity() {
+        return BookContract.builder()
+                .book(Book.builder().id(bookId).title(title).build())
+                .bookStore(BookStore.builder().id(bookStoreId).name(name).build())
+                .price(price)
+                .build();
+    }
+
+    /** Dto -> @Entity @Id */
+    /** @IdClass를 사용하는 Entity의 Dto라서 만듦 */
+    public BookContractId toEntryKey() {
+        new BookContractId(bookId, bookStoreId);
+    }
+}
+```
+> #### @Controller ~ @Service: Dto
+> > #### 이 사이에서 Dto <-> @Entity 변환
+> #### @Service ~ @Repository: @Entity

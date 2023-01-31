@@ -57,8 +57,8 @@ public class BookStoreController {
 	}
 	
 	@GetMapping("/all")
-	public ResponseEntity<List<BookStore>> getStores() {
-		ResponseEntity<List<BookStore>> entity = null;
+	public ResponseEntity<List<BookStoreDto>> getStores() {
+		ResponseEntity<List<BookStoreDto>> entity = null;
 		logger.info("get all stores......");
 		try {
 			entity = new ResponseEntity<>(service.getBookStores(), HttpStatus.OK);

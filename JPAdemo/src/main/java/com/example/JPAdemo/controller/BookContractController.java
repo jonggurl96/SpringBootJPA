@@ -1,20 +1,20 @@
 package com.example.JPAdemo.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.JPAdemo.domain.BookContract;
+import com.example.JPAdemo.dto.BookContractDto;
 import com.example.JPAdemo.service.BookContractService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,14 +29,14 @@ public class BookContractController {
 	private static final Logger logger = LoggerFactory.getLogger(BookContractController.class);
 	
 	@PostMapping("/make")
-	public ResponseEntity<BookContract> makeContract(@RequestBody Map<String, String> map) {
-		ResponseEntity<BookContract> entity = null;
-		long bid = Long.parseLong(map.get("book"));
-		long bsid = Long.parseLong(map.get("bs"));
-		int price = Integer.parseInt(map.get("price"));
+	public ResponseEntity<BookContractDto> makeContract(@RequestBody BookContractDto dto) {
+		ResponseEntity<BookContractDto> entity = null;
+		long bid = dto.getBookId();
+		long bsid = dto.getBookStoreId();
+		int price = dto.getPrice();
 		logger.info("make contract book: " + bid + " and store: " + bsid + ", price: " + price);
 		try {
-			entity = new ResponseEntity<>(service.make(bid, bsid, price), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.make(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -44,14 +44,13 @@ public class BookContractController {
 		return entity;
 	}
 	
-	@GetMapping("/{bid}/{bsid}")
-	public ResponseEntity<BookContract> getOne(
-			@PathVariable("bid") long bid,
-			@PathVariable("bsid") long bsid) {
-		ResponseEntity<BookContract> entity = null;
-		logger.info("search a contract: " + bid + ", " + bsid);
+	@PostMapping("/one")
+	public ResponseEntity<BookContractDto> getOne(
+			@RequestBody BookContractDto dto) {
+		ResponseEntity<BookContractDto> entity = null;
+		logger.info("search a contract: " + dto.getBookId() + ", " + dto.getBookStoreId());
 		try {
-			entity = new ResponseEntity<>(service.getOne(bid, bsid), HttpStatus.OK);
+			entity = new ResponseEntity<>(service.getOne(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -60,11 +59,38 @@ public class BookContractController {
 	}
 	
 	@GetMapping("/all")
-	public ResponseEntity<List<BookContract>> getAll() {
-		ResponseEntity<List<BookContract>> entity = null;
+	public ResponseEntity<List<BookContractDto>> getAll() {
+		ResponseEntity<List<BookContractDto>> entity = null;
 		logger.info("search all contracts......");
 		try {
 			entity = new ResponseEntity<>(service.getAll(), HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@DeleteMapping("/delete")
+	public ResponseEntity<String> remove(@RequestBody BookContractDto dto) {
+		ResponseEntity<String> entity = null;
+		logger.info("delete contract......: " + dto.getBookId() + ", " + dto.getBookStoreId());
+		try {
+			service.breakIt(dto);
+			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return entity;
+	}
+	
+	@PutMapping("/renew")
+	public ResponseEntity<BookContractDto> renew(@RequestBody BookContractDto dto) {
+		ResponseEntity<BookContractDto> entity = null;
+		logger.info("delete contract......: " + dto.getBookId() + ", " + dto.getBookStoreId());
+		try {
+			entity = new ResponseEntity<>(service.renewal(dto), HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);

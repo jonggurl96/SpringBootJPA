@@ -14,6 +14,9 @@ insert into book_store (id, name)
 values (2, '교보문고');
 
 insert into book_contract(book_id, book_store_id, price)
+values (1, 1, 13900);
+
+insert into book_contract(book_id, book_store_id, price)
 values (2, 1, 14900);
 
 insert into book_contract(book_id, book_store_id, price)
@@ -24,6 +27,3 @@ values (1, 2, 16900);
 
 insert into book_contract(book_id, book_store_id, price)
 values (2, 2, 17900);
-
-insert into book_contract(book_id, book_store_id, price)
-values (3, 2, 18900);

@@ -11,7 +11,7 @@ public interface BookStoreService {
 	
 	public BookStore getABookStore(long id) throws Exception;
 	
-	public List<BookStore> getBookStores() throws Exception;
+	public List<BookStoreDto> getBookStores() throws Exception;
 	
 	public BookStore remodeling(BookStoreDto dto) throws Exception;
 	
