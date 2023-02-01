@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.JPAdemo.converter.BookDtoConverter;
 import com.example.JPAdemo.dto.BookDto;
 import com.example.JPAdemo.service.BookService;
 
@@ -49,7 +50,7 @@ public class BookController {
 	public ResponseEntity<BookDto> registBook(@RequestBody BookDto dto) {
 		ResponseEntity<BookDto> entity = null;
 		try {
-			dto = new BookDto(service.registBook(dto));
+			dto = BookDtoConverter.toDto(service.registBook(dto));
 			entity = new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -63,7 +64,7 @@ public class BookController {
 		ResponseEntity<BookDto> entity = null;
 		logger.info("update: " + dto);
 		try {
-			dto = new BookDto(service.republishBook(dto));
+			dto = BookDtoConverter.toDto(service.republishBook(dto));
 			entity = new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -90,7 +91,7 @@ public class BookController {
 		ResponseEntity<BookDto> entity = null;
 		logger.info("select: " + id);
 		try {
-			BookDto dto = new BookDto(service.chooseBook(id));
+			BookDto dto = BookDtoConverter.toDto(service.chooseBook(id));
 			entity = new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e) {
 			logger.error(e.getMessage());

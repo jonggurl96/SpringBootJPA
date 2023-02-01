@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.JPAdemo.converter.BookDtoConverter;
 import com.example.JPAdemo.domain.Book;
 import com.example.JPAdemo.dto.BookDto;
 import com.example.JPAdemo.repository.BookRepository;
@@ -24,7 +25,7 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Book registBook(BookDto dto) throws Exception {
-		return bookRepository.save(dto.toEntity());
+		return bookRepository.save(BookDtoConverter.toEntity(dto));
 	}
 
 	@Override
@@ -39,14 +40,14 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	public Book republishBook(BookDto dto) throws Exception {
-		return bookRepository.save(dto.toEntity());
+		return bookRepository.save(BookDtoConverter.toEntity(dto));
 	}
 
 	@Override
 	public List<BookDto> bookList() throws Exception {
 		List<BookDto> dtos = new ArrayList<BookDto>();
 		for(Book book : bookRepository.findAll()) {
-			dtos.add(new BookDto(book));
+			dtos.add(BookDtoConverter.toDto(book));
 		}
 		return dtos;
 	}

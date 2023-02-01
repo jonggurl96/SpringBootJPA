@@ -31,8 +31,8 @@ public class BookContractController {
 	@PostMapping("/make")
 	public ResponseEntity<BookContractDto> makeContract(@RequestBody BookContractDto dto) {
 		ResponseEntity<BookContractDto> entity = null;
-		long bid = dto.getBookId();
-		long bsid = dto.getBookStoreId();
+		long bid = dto.getBook().getId();
+		long bsid = dto.getBookStore().getId();
 		int price = dto.getPrice();
 		logger.info("make contract book: " + bid + " and store: " + bsid + ", price: " + price);
 		try {
@@ -48,7 +48,7 @@ public class BookContractController {
 	public ResponseEntity<BookContractDto> getOne(
 			@RequestBody BookContractDto dto) {
 		ResponseEntity<BookContractDto> entity = null;
-		logger.info("search a contract: " + dto.getBookId() + ", " + dto.getBookStoreId());
+		logger.info("search a contract: " + dto.getBook().getId() + ", " + dto.getBookStore().getId());
 		try {
 			entity = new ResponseEntity<>(service.getOne(dto), HttpStatus.OK);
 		} catch (Exception e) {
@@ -74,7 +74,7 @@ public class BookContractController {
 	@DeleteMapping("/delete")
 	public ResponseEntity<String> remove(@RequestBody BookContractDto dto) {
 		ResponseEntity<String> entity = null;
-		logger.info("delete contract......: " + dto.getBookId() + ", " + dto.getBookStoreId());
+		logger.info("delete contract......: " + dto.getBook().getId() + ", " + dto.getBookStore().getId());
 		try {
 			service.breakIt(dto);
 			entity = new ResponseEntity<>("SUCCESS", HttpStatus.OK);
@@ -88,7 +88,7 @@ public class BookContractController {
 	@PutMapping("/renew")
 	public ResponseEntity<BookContractDto> renew(@RequestBody BookContractDto dto) {
 		ResponseEntity<BookContractDto> entity = null;
-		logger.info("delete contract......: " + dto.getBookId() + ", " + dto.getBookStoreId());
+		logger.info("delete contract......: " + dto.getBook().getId() + ", " + dto.getBookStore().getId());
 		try {
 			entity = new ResponseEntity<>(service.renewal(dto), HttpStatus.OK);
 		} catch (Exception e) {

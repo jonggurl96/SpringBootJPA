@@ -253,43 +253,35 @@ public class BookContractId implements Serializable { // Repository<T, Id: Seria
                                 ...
 ```
 ## DTO 사용하기!!
-repository에서 읽어온 값을 DTO에 필요한 값만 저장하여 위와 같은 문제를 방지
-> dto에서 entity 값이나 해당 entity의 dto 값을 멤버 변수로 삼으면 해결되지 않을 수 있으니 정말 필요한 변수만 되도록 premitive 값으로 받아온다
+> repository에서 읽어온 값을 DTO에 필요한 값만 저장하여 위와 같은 문제를 방지
 ```
 public class BookContractDto {
     /** Book */
-    private long bookId;
-    private String title;
+    private BookDto book;
     /** BookStore */
-    private long bookStoreId;
-    private String name;
+    private bookStoreDto bookStore;
 
     private int price;
 
-    /** 아래는 Dto와 @Entity를 변환해주는 메소드들 중간 계층에 분리시킬 수 있으나 귀찮아서 여기서 함 */
-
-    /** @Entity -> Dto */
-    public BookContractDto(BookContract bc) {
-        this.bookId = bc.getBook().getId();
-        ...
-    }
-
-    /** Dto -> @Entity */
-    public BookContract toEntity() {
-        return BookContract.builder()
-                .book(Book.builder().id(bookId).title(title).build())
-                .bookStore(BookStore.builder().id(bookStoreId).name(name).build())
-                .price(price)
-                .build();
-    }
-
-    /** Dto -> @Entity @Id */
-    /** @IdClass를 사용하는 Entity의 Dto라서 만듦 */
-    public BookContractId toEntryKey() {
-        new BookContractId(bookId, bookStoreId);
-    }
 }
 ```
 > #### @Controller ~ @Service: Dto
-> > #### 이 사이에서 Dto <-> @Entity 변환
+> > #### 이 사이에서 Dto <-> @Entity 변환 - BookContractDtoConverter
 > #### @Service ~ @Repository: @Entity
+```
+public class BookContractDtoConverter {
+    public static BookContractDto toDto(BookContract bc) {
+        return new BookContractDTO(bc.getBook(), bc.getBookStore());
+    }
+    public static BookContract toEntity(BookContractDto dto) {
+        return BookContract.builder()
+                    .book(BookDtoConverter.toEntity(dto.getBook()))
+                    .bookStore(BookStoreDtoConverter.toEntity(dto.getBookStore()))
+                    .price(dto.getPrice())
+                    .build();
+    }
+    public static BookContractId toEntityKey(BookContractDto dto) {
+        return new BookContractId(dto.getBook().getId(), dto.getBookStore().getId());
+    }
+}
+```
